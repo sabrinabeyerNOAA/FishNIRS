@@ -1,7 +1,28 @@
+# Test run for sablefish neural network model for modeled ages using FTNIRS
+# spectral data and other ancillary information
+# author: John Wallace, NOAA NWFSC (retired)
+# archived: April 30, 2025 (2nd repo fork)
 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# JRWToolBox package
+# https://github.com/John-R-Wallace-NOAA/JRWToolBox/blob/master/README.md
+# Get the remotes package, if it is not already installed.
+if (!any(installed.packages()[, 1] %in% "remotes"))  install.packages('remotes')  
 
+remotes::install_github("John-R-Wallace-NOAA/JRWToolBox", INSTALL_opts = "--no-staged-install")
+
+# # Some R installations may require: download.file.method = "auto" in options():
+# oldOpts <- options(download.file.method = "auto")  # Sometimes remotes::install_github() throws an error without this
+# The error may then require: force = TRUE
+# remotes::install_github("John-R-Wallace-NOAA/JRWToolBox", INSTALL_opts = "--no-staged-install", force = TRUE) 
+# options(oldOpts)
+library(JRWToolBox)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# create a folder to save results  
 dir.create("C:/SIDT/Sable_Test", showWarnings = FALSE, recursive = TRUE)
 setwd("C:/SIDT/Sable_Test")
+
 
 # Save this file (https://github.com/John-R-Wallace-NOAA/FishNIRS/blob/main/Sable_Test/Run%20Sable_Test.R) into C:/SIDT/Sable_Test"
 
@@ -52,19 +73,21 @@ file.copy("C:/SIDT/Sable_Test/iPLS, NN Model Batch Self Call Loop.R", "C:/SIDT/T
 
 
 Model_Spectra_Meta <- Read_OPUS_Spectra(Spectra_Set = "Sable_Test", fileNames_Sort_Seqment = NULL,
-      Spectra_Path = "2024_Scans/", # Need the last "/" for now
+      Spectra_Path = "2024_Scans/", # Need the last "/" for now # Use this if data is already downloaded and in the correct file
+      # use the following to pull data from the NWFSC network
       # Spectra_Path = "//nwcfile.nmfs.local/FRAM/Assessments/Aging Lab/NIRS Scanning Data/Otoliths/FT_NIRS_Project/PRD_Production/NWFSC_COMBO/SABL_Sablefish/2024/",
       htmlPlotFolder = "Figures_Sable_Test_2024", Static_Figure = "Sable_Test_2024.png", Meta_Path = NULL, 
       Extra_Meta_Path = "C:/SIDT/Get Otie Info from Data Warehouse/selectSpAgesFramFeb2025.RData", excelSheet = 3, 
       shortNameSegments = c(1, 5), shortNameSuffix = 'Sable_Test', Debug = TRUE)
-      
+  # Sabrina: line 367 of Read_OPUS_Spectra() function is commented out...but maybe shouldn't be? Otherwise the function
+  # is not producing the object: Model_Spectra_Meta
       
 headTail(Model_Spectra_Meta, 2, 2, 2, 57)   
        
 Table(Model_Spectra_Meta$TMA)
 
-save(Model_Spectra_Meta, file = "Sable_Test_2024_Model_Spectra_Meta_ALL_GOOD_DATA.RData")
-
+save(Model_Spectra_Meta, file = "Sable_Test_2024_Model_Spectra_Meta_ALL_GOOD_DATA.RData") # Sabrina: this is saving as an R Workspace
+saveRDS(Model_Spectra_Meta, file = "Sable_Test_2024_Model_Spectra_Meta_ALL_GOOD_DATA.RDS") # this saves as an RDS file
 
 # --- Train the NN model and predict the ages ---
 
